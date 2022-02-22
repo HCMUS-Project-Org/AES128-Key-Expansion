@@ -86,6 +86,15 @@ int *expand(string K)
 
 int main()
 {
+   cout << "-----------------------------------";
+   cout << "--          Miller Rabin         --";
+   cout << "-----------------------------------";
+   cout << "-- 19127392 - To Gia Hao         --";
+   cout << "-- 19127525 - Nguyen Thanh Quan  --";
+   cout << "-- 19127625 - Lam Chi Van        --";
+   cout << "-- 19127631 - Duong Tien Vinh    --";
+   cout << "-----------------------------------";
+
    // using hex
    cout << std::hex;
 
