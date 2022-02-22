@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -40,73 +41,134 @@ int inverse_s_box[16][16] = {
     {0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61},
     {0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d}};
 
-int C[11] = {0x00000000, 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000};
+unsigned int C[] = {0x00000000, 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000};
 
 // conver four_bytes to int
-int four_bytes_to_int(char s[])
+unsigned int four_bytes_to_int(string s)
 {
    // input: s[4] (4 bytes)
    // output: a (hex)
-   // ----------------------
-   // example:
-   // input: s[4]="That"
-   // convert to dec (ascii):  84 104 97 116 (dec)
-   // convert to hex: 54 68 61 74 (hex)
-   // output: 0x54686174 (hex)
-   int a = 0;
-   return a; // hex
+
+   string st = "";
+   stringstream ss;
+
+   // convert: char array -> Hex string
+   for (int i = 0; i < 4; i++)
+   {
+      ss << hex << (int)s[i];
+   }
+
+   st += ss.str();
+
+   // parse: Hex string -> Hex number (base 16)
+   unsigned int a = stoul(st, nullptr, 16);
+
+   return a;
 }
 
 // convert int to four_bytes
-char *int_to_four_bytes(int a)
+string int_to_four_bytes(unsigned int a)
 {
    // input: a (hex)
    // output: s[4] (4 bytes)
-   // ----------------------
-   // example:
-   // input: 0x54686174 (hex) = 54 68 51 74
-   // convert to dec:  84 104 97 116 (dec)
-   // convert to char (ascii): T h a t
-   // output: s[4]="That"
+
+   stringstream ss;
+   string s;
+   string result = "";
+
+   ss << hex << a;
+   ss >> s;
+
+   for (int i = 0; i < s.length(); i = i + 2)
+   {
+      int num;
+      string w = s.substr(i, 2);
+
+      // clear ss content
+      ss.clear();
+      ss.str("");
+
+      ss << dec << w;
+      ss >> hex >> num;
+
+      char c = (char)num;
+      result += c;
+   }
+
+   return result;
 }
 
-int sixteen_bytes_to_int(char s[])
+unsigned int *sixteen_bytes_to_four_int(string s)
 {
+   // input: 16 bytes
+   // output: 4 ints
+   unsigned int *result = new unsigned int[4];
+
+   // split s into four bytes each
+   for (int i = 0; i < s.length(); i += 4)
+   {
+      string str = s.substr(i, 4);
+
+      stringstream ss;
+      unsigned int a = four_bytes_to_int(str);
+
+      result[i / 4] = a;
+   }
+
+   return result;
 }
 
-char *int_to_sixteen_bytes(int a)
+string four_int_to_sixteen_bytes(unsigned int *a)
 {
+   // input: 4 ints
+   // output: 16 bytes
+
+   string result = "";
+
+   for (int i = 0; i < 4; i++)
+   {
+      string four_bytes = int_to_four_bytes(a[i]);
+      result += four_bytes;
+   }
+
+   return result;
 }
 
-int *expand(string K)
+unsigned int *expand(string K)
 {
    // input: four_word (128 bits) key
    // output: array of key
+   return 0;
 }
 
 int main()
 {
-   cout << "-----------------------------------";
-   cout << "--          Miller Rabin         --";
-   cout << "-----------------------------------";
-   cout << "-- 19127392 - To Gia Hao         --";
-   cout << "-- 19127525 - Nguyen Thanh Quan  --";
-   cout << "-- 19127625 - Lam Chi Van        --";
-   cout << "-- 19127631 - Duong Tien Vinh    --";
-   cout << "-----------------------------------";
-
-   // using hex
-   cout << std::hex;
-
-   string K = "";
-   int n;
+   cout << "------------------------------------------------------" << endl;
+   cout << "--                   Miller Rabin                   --" << endl;
+   cout << "--        --------------------------------          --" << endl;
+   cout << "-- 19127392 - 19127525 - 19127625 - 19127631        --" << endl;
+   cout << "------------------------------------------------------" << endl;
 
    // input four_word key
-   cout << "Input four_word key:";
-   getline(cin, K);
+   // cout << "Input four_word key:";
+   // getline(cin, K);
 
-   int *keys = expand(K);
-   cout << keys;
+   string K = "That";
+   unsigned int a = four_bytes_to_int(K);
+   cout << "K: " << K << endl;
+   cout << "4 bytes to int: " << hex << a << endl;
+   cout << "int to 4 bytes: " << int_to_four_bytes(a) << endl;
+
+   cout << endl;
+
+   K = "Thats my Kung Fu";
+   unsigned int *aa = sixteen_bytes_to_four_int(K);
+   cout << "K: " << K << endl;
+   cout << "16 bytes to 4 ints: " << endl;
+   for (int i = 0; i < 4; i++)
+      cout << "- int[" << i << "]: " << hex << aa[i] << endl;
+   string s = four_int_to_sixteen_bytes(aa);
+   cout << "4 bytes to 16 bytes: " << s << endl;
 
    return 0;
 }
