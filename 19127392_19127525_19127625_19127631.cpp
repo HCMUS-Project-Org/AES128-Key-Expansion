@@ -139,7 +139,6 @@ unsigned int rotate_left(unsigned int a, int k)
         ss << arr[(mod + i) % (s.length() / 2)];
 
     ss >> hex >> result;
-    cout << hex << result << endl;
     return result;
 }
 
@@ -147,7 +146,6 @@ unsigned int read_s_box(unsigned int a)
 {
     stringstream ss;
     string s = "";
-    string temp = "";
     unsigned int result;
     int x, y;
 
