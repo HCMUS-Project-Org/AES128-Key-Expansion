@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <bitset>
 
 using namespace std;
 
@@ -109,7 +110,6 @@ unsigned int *sixteen_bytes_to_four_int(string s)
    {
       string str = s.substr(i, 4);
 
-      stringstream ss;
       unsigned int a = four_bytes_to_int(str);
 
       result[i / 4] = a;
@@ -134,17 +134,120 @@ string four_int_to_sixteen_bytes(unsigned int *a)
    return result;
 }
 
-unsigned int *expand(string K)
+bitset<32> hex_to_bin(unsigned int hexdec)
+{
+    stringstream ss;
+    ss << hex << hexdec;
+    unsigned int num;
+    ss >> num;
+    bitset<32> bit(num);
+    return bit;
+}
+
+unsigned int bin_to_hex(bitset<32> binary)
+{
+    stringstream ss;
+    ss << hex << binary.to_ulong();
+    unsigned int hexa;
+    ss >> hexa;
+    return hexa;
+}
+
+bitset<32> add_bits(bitset<32> bit_a, bitset<32> bit_b)
+{
+    return (bit_a ^ bit_b);
+}
+
+unsigned int rotate_left(unsigned int a, int k)
+{
+    stringstream ss;
+    string s;
+    unsigned int result;
+
+    //convert to string
+    ss << hex << a;
+    ss >> s;
+    
+    if (s.length() < 8)
+        s = "0" + s;
+
+    //convert from string to array
+    string arr[4];
+    for (int i = 0; i < s.length(); i += 2) {
+        arr[i/2] = s.substr(i, 2);
+    }
+             
+    ss.clear();
+    ss.str("");
+    int mod = k % (s.length() / 2);
+    for (int i = 0; i < s.length()/2; i++ )
+        ss << arr[(mod + i) % (s.length() / 2)];
+
+    ss >> hex >> result;
+    return result;
+}
+
+unsigned int read_s_box(unsigned int a)
+{
+    stringstream ss;
+    string s = "";
+    unsigned int result;
+    int x, y;
+
+    ss << hex << a;
+    ss >> s;
+    if (s.length() < 8)
+        s = "0" + s;
+
+    ss.clear();
+    ss.str("");
+    for (int i = 0; i < 8; i+=2)
+    {
+        x = (s[i] >= 'a') ? (s[i] - 'a' + 10) : (s[i] - '0');
+        y = (s[i + 1] >= 'a') ? (s[i + 1] - 'a' + 10) : (s[i + 1] - '0');
+        ss << s_box[x][y];
+    }
+    
+    ss >> hex >> result;
+    return result;
+}
+
+unsigned int **expand(unsigned int* k)
 {
    // input: four_word (128 bits) key
    // output: array of key
-   return 0;
+
+   // create 2d dynamic arr
+   unsigned int** ki = new unsigned int* [11];
+   for (int i = 0; i < 11; ++i)
+       ki[i]= new unsigned int[4];
+   
+   //assign k0 = k
+   ki[0] = k;
+
+   for (int i = 1; i <= 10; i++)
+   {
+       //ki[0] = ki[i-1][0] + s_box(k[i-1][3] <<< 8) + C[i]
+       ki[i][0] = bin_to_hex(add_bits(add_bits(hex_to_bin(ki[i - 1][0]), hex_to_bin(read_s_box(rotate_left(ki[i - 1][3], 1)))), hex_to_bin(C[i])));
+
+       //ki[1] = ki[i-1][1] + k[i][0]
+       ki[i][1] = bin_to_hex(add_bits(hex_to_bin(ki[i - 1][1]), hex_to_bin(ki[i][0])));
+
+       //ki[2] = ki[i-1][2] + k[i][1]
+       ki[i][2] = bin_to_hex(add_bits(hex_to_bin(ki[i - 1][2]), hex_to_bin(ki[i][1])));
+
+       //ki[3] = ki[i-1][3] + k[i][2]
+       ki[i][3] = bin_to_hex(add_bits(hex_to_bin(ki[i - 1][3]), hex_to_bin(ki[i][2])));
+           
+   }
+
+   return ki;
 }
 
 int main()
 {
    cout << "------------------------------------------------------" << endl;
-   cout << "--                   Miller Rabin                   --" << endl;
+   cout << "--                   AES 128 expand                 --" << endl;
    cout << "--        --------------------------------          --" << endl;
    cout << "-- 19127392 - 19127525 - 19127625 - 19127631        --" << endl;
    cout << "------------------------------------------------------" << endl;
@@ -166,9 +269,19 @@ int main()
    cout << "K: " << K << endl;
    cout << "16 bytes to 4 ints: " << endl;
    for (int i = 0; i < 4; i++)
-      cout << "- int[" << i << "]: " << hex << aa[i] << endl;
-   string s = four_int_to_sixteen_bytes(aa);
-   cout << "4 bytes to 16 bytes: " << s << endl;
+       cout << "- int[" << i << "]: " << hex << aa[i] << endl;
 
+   string s = four_int_to_sixteen_bytes(aa);
+   cout << "4 int to 16 bytes: " << s << endl;
+
+   unsigned int** k = expand(aa);
+
+   cout << "\nexpand:" << endl;
+   for (int i = 0; i < 11; i++)
+   {
+       cout << "K" << i << ":" << endl;
+       for (int j = 0; j < 4; j++)
+           cout << "\t- int[" << j << "]: " << hex << k[i][j] << endl;
+   }
    return 0;
 }
