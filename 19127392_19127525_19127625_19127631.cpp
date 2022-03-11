@@ -26,13 +26,18 @@ int s_box[16][16] = {
 
 long long C[] = {0x00000000, 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000};
 
-string handle_input(string K) {
+string handle_input(string K)
+{
     if (K.length() == 16)
         return K;
-    if (K.length() > 16) {
+    if (K.length() > 16)
+    {
         return K.substr(0, 16);
-    } else {
-        while (K.length() < 16) {
+    }
+    else
+    {
+        while (K.length() < 16)
+        {
             K += " ";
         }
 
@@ -81,7 +86,6 @@ long long *sixteen_bytes_to_four_int(string s)
 
     return result;
 }
-
 
 long long rotate_left(long long a, int k)
 {
@@ -171,7 +175,7 @@ string *expand(long long *k)
 
         for (int j = 0; j < 4; j++)
         {
-            ss << hex << setw(8) << setfill('0')  << ki[i][j];
+            ss << hex << setw(8) << setfill('0') << ki[i][j];
 
             temp_str += ss.str();
             ss.clear();
@@ -185,29 +189,40 @@ string *expand(long long *k)
 
 int main()
 {
-    cout << "------------------------------------------------------" << endl;
-    cout << "--                   AES 128 expand                 --" << endl;
-    cout << "--        --------------------------------          --" << endl;
-    cout << "-- 19127392 - 19127525 - 19127625 - 19127631        --" << endl;
-    cout << "------------------------------------------------------" << endl;
+    cout << "======================================================" << endl;
+    cout << "==                   AES 128 expand                 ==" << endl;
+    cout << "==        --------------------------------          ==" << endl;
+    cout << "==    19127392 - 19127525 - 19127625 - 19127631     ==" << endl;
+    cout << "======================================================" << endl;
 
-    string K;
-
-    // input four_word key
-    cout << "\n> Input four_word key: ";
-    getline(cin, K);
-
-    K = handle_input(K);
-    cout << "> Four_word key after handle: \"" << K << "\"" << endl;
-
-    long long *aa = sixteen_bytes_to_four_int(K);
-
-    string *k = expand(aa);
-
-    cout << "\n> Expand:" << endl;
-    for (int i = 0; i < 11; i++)
+    while (true)
     {
-        cout << "K[" << i << "]: " << k[i] << endl;
+        try
+        {
+            string K;
+
+            // input four_word key
+            cout << "\n> Input four_word key: ";
+            getline(cin, K);
+
+            K = handle_input(K);
+            cout << "> Four_word key after handle: \"" << K << "\"" << endl;
+
+            long long *aa = sixteen_bytes_to_four_int(K);
+
+            string *k = expand(aa);
+
+            cout << "> Expand:" << endl;
+            for (int i = 0; i < 11; i++)
+            {
+                cout << "K[" << i << "]: " << k[i] << endl;
+            }
+
+            return 0;
+        } catch(...) {
+            cout << "[Error] Do not Enter accented characters!" << endl;
+            cout << "------------------------------------------------------" << endl;
+        };
     }
 
     return 0;
