@@ -63,38 +63,6 @@ long long four_bytes_to_int(string s)
     return a;
 }
 
-// convert int to four_bytes
-string int_to_four_bytes(long long a)
-{
-    // input: a (hex)
-    // output: s[4] (4 bytes)
-
-    stringstream ss;
-    string s;
-    string result = "";
-
-    ss << hex << a;
-    ss >> s;
-
-    for (int i = 0; i < s.length(); i = i + 2)
-    {
-        int num;
-        string w = s.substr(i, 2);
-
-        // clear ss content
-        ss.clear();
-        ss.str("");
-
-        ss << dec << w;
-        ss >> hex >> num;
-
-        char c = (char)num;
-        result += c;
-    }
-
-    return result;
-}
-
 long long *sixteen_bytes_to_four_int(string s)
 {
     // input: 16 bytes
@@ -114,21 +82,6 @@ long long *sixteen_bytes_to_four_int(string s)
     return result;
 }
 
-string four_int_to_sixteen_bytes(long long *a)
-{
-    // input: 4 ints
-    // output: 16 bytes
-
-    string result = "";
-
-    for (int i = 0; i < 4; i++)
-    {
-        string four_bytes = int_to_four_bytes(a[i]);
-        result += four_bytes;
-    }
-
-    return result;
-}
 
 long long rotate_left(long long a, int k)
 {
@@ -180,38 +133,7 @@ long long read_s_box(long long a)
     return result;
 }
 
-long long **expand(long long *k)
-{
-    // input: four_word (128 bits) key
-    // output: array of key
-
-    // create 2d dynamic arr
-    long long **ki = new long long *[11];
-    for (int i = 0; i < 11; ++i)
-        ki[i] = new long long[4];
-
-    //assign k0 = k
-    ki[0] = k;
-
-    for (int i = 1; i <= 10; i++)
-    {
-        //ki[0] = ki[i-1][0] + s_box(k[i-1][3] <<< 8) + C[i]
-        ki[i][0] = ki[i - 1][0] ^ read_s_box(rotate_left(ki[i - 1][3], 1)) ^ C[i]; //^ = Xor
-
-        //ki[1] = ki[i-1][1] + k[i][0]
-        ki[i][1] = ki[i - 1][1] ^ ki[i][0];
-
-        //ki[2] = ki[i-1][2] + k[i][1]
-        ki[i][2] = ki[i - 1][2] ^ ki[i][1];
-
-        //ki[3] = ki[i-1][3] + k[i][2]
-        ki[i][3] = ki[i - 1][3] ^ ki[i][2];
-    }
-
-    return ki;
-}
-
-string *exp(long long *k)
+string *expand(long long *k)
 {
     // input: four_word (128 bits) key
     // output: array of key
@@ -280,7 +202,7 @@ int main()
 
     long long *aa = sixteen_bytes_to_four_int(K);
 
-    string *k = exp(aa);
+    string *k = expand(aa);
 
     cout << "\n> Expand:" << endl;
     for (int i = 0; i < 11; i++)
