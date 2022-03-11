@@ -26,6 +26,20 @@ int s_box[16][16] = {
 
 long long C[] = {0x00000000, 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000};
 
+string handle_input(string K) {
+    if (K.length() == 16)
+        return K;
+    if (K.length() > 16) {
+        return K.substr(0, 16);
+    } else {
+        while (K.length() < 16) {
+            K += " ";
+        }
+
+        return K;
+    }
+}
+
 // conver four_bytes to int
 long long four_bytes_to_int(string s)
 {
@@ -231,21 +245,21 @@ string *exp(long long *k)
     for (int i = 0; i <= 10; i++)
     {
         stringstream ss;
-        string a = "";
+        string temp_str = "";
+
         for (int j = 0; j < 4; j++)
         {
-            ss << hex << ki[i][j];
-            a += ss.str();
-            // cout << "i:" << i << " - j: " << j << " - a: " << a << endl;
+            ss << hex << setw(8) << setfill('0')  << ki[i][j];
+
+            temp_str += ss.str();
             ss.clear();
             ss.str("");
         }
-        key[i] = a;
+        key[i] = temp_str;
     }
 
     return key;
 }
-
 
 int main()
 {
@@ -255,29 +269,24 @@ int main()
     cout << "-- 19127392 - 19127525 - 19127625 - 19127631        --" << endl;
     cout << "------------------------------------------------------" << endl;
 
+    string K;
+
     // input four_word key
-    // cout << "Input four_word key:";
-    // getline(cin, K);
+    cout << "\n> Input four_word key: ";
+    getline(cin, K);
 
-    string K = "Thats my Kung Fu";
+    K = handle_input(K);
+    cout << "> Four_word key after handle: \"" << K << "\"" << endl;
+
     long long *aa = sixteen_bytes_to_four_int(K);
-    //    cout << "K: " << K << endl;
-    //    cout << "16 bytes to 4 ints: " << endl;
-    //    for (int i = 0; i < 4; i++)
-    //        cout << "- int[" << i << "]: " << hex << aa[i] << endl;
-
-    //    string s = four_int_to_sixteen_bytes(aa);
-    //    cout << "4 int to 16 bytes: " << s << endl;
 
     string *k = exp(aa);
 
-    cout << "\nexpand:" << endl;
+    cout << "\n> Expand:" << endl;
     for (int i = 0; i < 11; i++)
     {
-        // cout << "K" << i << ":" << endl;
-        // for (int j = 0; j < 4; j++)
-        //     cout << "\t- int[" << j << "]: " << hex << k[i][j] << endl;
-        cout << "key [" << i << "]: " << k[i] << endl;
+        cout << "K[" << i << "]: " << k[i] << endl;
     }
+
     return 0;
 }
