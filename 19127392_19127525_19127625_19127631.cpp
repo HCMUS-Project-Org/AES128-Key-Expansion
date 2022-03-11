@@ -24,137 +24,138 @@ int s_box[16][16] = {
     {0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf},
     {0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16}};
 
-unsigned int C[] = {0x00000000, 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000};
+long long C[] = {0x00000000, 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000, 0x80000000, 0x1b000000, 0x36000000};
 
 // conver four_bytes to int
-unsigned int four_bytes_to_int(string s)
+long long four_bytes_to_int(string s)
 {
-   // input: s[4] (4 bytes)
-   // output: a (hex)
+    // input: s[4] (4 bytes)
+    // output: a (hex)
 
-   string st = "";
-   stringstream ss;
+    string st = "";
+    stringstream ss;
 
-   // convert: char array -> Hex string
-   for (int i = 0; i < 4; i++)
-   {
-      ss << hex << (int)s[i];
-   }
+    // convert: char array -> Hex string
+    for (int i = 0; i < 4; i++)
+    {
+        ss << hex << (int)s[i];
+    }
 
-   st += ss.str();
+    st += ss.str();
 
-   // parse: Hex string -> Hex number (base 16)
-   unsigned int a = stoul(st, nullptr, 16);
+    // parse: Hex string -> Hex number (base 16)
+    long long a = stoul(st, nullptr, 16);
 
-   return a;
+    return a;
 }
 
 // convert int to four_bytes
-string int_to_four_bytes(unsigned int a)
+string int_to_four_bytes(long long a)
 {
-   // input: a (hex)
-   // output: s[4] (4 bytes)
+    // input: a (hex)
+    // output: s[4] (4 bytes)
 
-   stringstream ss;
-   string s;
-   string result = "";
+    stringstream ss;
+    string s;
+    string result = "";
 
-   ss << hex << a;
-   ss >> s;
+    ss << hex << a;
+    ss >> s;
 
-   for (int i = 0; i < s.length(); i = i + 2)
-   {
-      int num;
-      string w = s.substr(i, 2);
+    for (int i = 0; i < s.length(); i = i + 2)
+    {
+        int num;
+        string w = s.substr(i, 2);
 
-      // clear ss content
-      ss.clear();
-      ss.str("");
+        // clear ss content
+        ss.clear();
+        ss.str("");
 
-      ss << dec << w;
-      ss >> hex >> num;
+        ss << dec << w;
+        ss >> hex >> num;
 
-      char c = (char)num;
-      result += c;
-   }
+        char c = (char)num;
+        result += c;
+    }
 
-   return result;
+    return result;
 }
 
-unsigned int *sixteen_bytes_to_four_int(string s)
+long long *sixteen_bytes_to_four_int(string s)
 {
-   // input: 16 bytes
-   // output: 4 ints
-   unsigned int *result = new unsigned int[4];
+    // input: 16 bytes
+    // output: 4 ints
+    long long *result = new long long[4];
 
-   // split s into four bytes each
-   for (int i = 0; i < s.length(); i += 4)
-   {
-      string str = s.substr(i, 4);
+    // split s into four bytes each
+    for (int i = 0; i < s.length(); i += 4)
+    {
+        string str = s.substr(i, 4);
 
-      unsigned int a = four_bytes_to_int(str);
+        long long a = four_bytes_to_int(str);
 
-      result[i / 4] = a;
-   }
+        result[i / 4] = a;
+    }
 
-   return result;
+    return result;
 }
 
-string four_int_to_sixteen_bytes(unsigned int *a)
+string four_int_to_sixteen_bytes(long long *a)
 {
-   // input: 4 ints
-   // output: 16 bytes
+    // input: 4 ints
+    // output: 16 bytes
 
-   string result = "";
+    string result = "";
 
-   for (int i = 0; i < 4; i++)
-   {
-      string four_bytes = int_to_four_bytes(a[i]);
-      result += four_bytes;
-   }
+    for (int i = 0; i < 4; i++)
+    {
+        string four_bytes = int_to_four_bytes(a[i]);
+        result += four_bytes;
+    }
 
-   return result;
+    return result;
 }
 
-unsigned int rotate_left(unsigned int a, int k)
+long long rotate_left(long long a, int k)
 {
     stringstream ss;
     string s;
-    unsigned int result;
+    long long result;
 
     //convert to string
     ss << setfill('0') << setw(8) << hex << a;
     ss >> s;
-    
+
     //convert from string to array
     string arr[4];
-    for (int i = 0; i < s.length(); i += 2) {
-        arr[i/2] = s.substr(i, 2);
+    for (int i = 0; i < s.length(); i += 2)
+    {
+        arr[i / 2] = s.substr(i, 2);
     }
-             
+
     ss.clear();
     ss.str("");
     int mod = k % (s.length() / 2);
-    for (int i = 0; i < s.length()/2; i++ )
+    for (int i = 0; i < s.length() / 2; i++)
         ss << arr[(mod + i) % (s.length() / 2)];
 
     ss >> hex >> result;
     return result;
 }
 
-unsigned int read_s_box(unsigned int a)
+long long read_s_box(long long a)
 {
     stringstream ss;
     string s = "";
-    unsigned int result;
+    long long result;
     int x, y;
 
-    ss   << setfill('0') << setw(8) << hex << a;
-    ss  >> s;
+    ss << setfill('0') << setw(8) << hex << a;
+    ss >> s;
 
     ss.clear();
     ss.str("");
-    for (int i = 0; i < 8; i+=2)
+    for (int i = 0; i < 8; i += 2)
     {
         x = (s[i] >= 'a') ? (s[i] - 'a' + 10) : (s[i] - '0');
         y = (s[i + 1] >= 'a') ? (s[i + 1] - 'a' + 10) : (s[i + 1] - '0');
@@ -165,78 +166,118 @@ unsigned int read_s_box(unsigned int a)
     return result;
 }
 
-unsigned int **expand(unsigned int* k)
+long long **expand(long long *k)
 {
-   // input: four_word (128 bits) key
-   // output: array of key
+    // input: four_word (128 bits) key
+    // output: array of key
 
-   // create 2d dynamic arr
-   unsigned int** ki = new unsigned int* [11];
-   for (int i = 0; i < 11; ++i)
-       ki[i]= new unsigned int[4];
-   
-   //assign k0 = k
-   ki[0] = k;
+    // create 2d dynamic arr
+    long long **ki = new long long *[11];
+    for (int i = 0; i < 11; ++i)
+        ki[i] = new long long[4];
 
-   for (int i = 1; i <= 10; i++)
-   {
-       //ki[0] = ki[i-1][0] + s_box(k[i-1][3] <<< 8) + C[i]
-       ki[i][0] = ki[i - 1][0] ^ read_s_box(rotate_left(ki[i - 1][3], 1)) ^ C[i];       //^ = Xor
+    //assign k0 = k
+    ki[0] = k;
 
-       //ki[1] = ki[i-1][1] + k[i][0]
-       ki[i][1] = ki[i - 1][1] ^ ki[i][0];
+    for (int i = 1; i <= 10; i++)
+    {
+        //ki[0] = ki[i-1][0] + s_box(k[i-1][3] <<< 8) + C[i]
+        ki[i][0] = ki[i - 1][0] ^ read_s_box(rotate_left(ki[i - 1][3], 1)) ^ C[i]; //^ = Xor
 
-       //ki[2] = ki[i-1][2] + k[i][1]
-       ki[i][2] = ki[i - 1][2] ^ ki[i][1];
+        //ki[1] = ki[i-1][1] + k[i][0]
+        ki[i][1] = ki[i - 1][1] ^ ki[i][0];
 
-       //ki[3] = ki[i-1][3] + k[i][2]
-       ki[i][3] = ki[i - 1][3] ^ ki[i][2];
-           
-   }
+        //ki[2] = ki[i-1][2] + k[i][1]
+        ki[i][2] = ki[i - 1][2] ^ ki[i][1];
 
-   return ki;
+        //ki[3] = ki[i-1][3] + k[i][2]
+        ki[i][3] = ki[i - 1][3] ^ ki[i][2];
+    }
+
+    return ki;
 }
+
+string *exp(long long *k)
+{
+    // input: four_word (128 bits) key
+    // output: array of key
+
+    // create 2d dynamic arr
+    long long **ki = new long long *[11];
+    string *key = new string[11];
+    stringstream s;
+
+    for (int i = 0; i < 11; ++i)
+        ki[i] = new long long[4];
+
+    //assign k0 = k
+    ki[0] = k;
+
+    for (int i = 1; i <= 10; i++)
+    {
+        //ki[0] = ki[i-1][0] + s_box(k[i-1][3] <<< 8) + C[i]
+        ki[i][0] = ki[i - 1][0] ^ read_s_box(rotate_left(ki[i - 1][3], 1)) ^ C[i]; //^ = Xor
+
+        //ki[1] = ki[i-1][1] + k[i][0]
+        ki[i][1] = ki[i - 1][1] ^ ki[i][0];
+
+        //ki[2] = ki[i-1][2] + k[i][1]
+        ki[i][2] = ki[i - 1][2] ^ ki[i][1];
+
+        //ki[3] = ki[i-1][3] + k[i][2]
+        ki[i][3] = ki[i - 1][3] ^ ki[i][2];
+    }
+
+    for (int i = 0; i <= 10; i++)
+    {
+        stringstream ss;
+        string a = "";
+        for (int j = 0; j < 4; j++)
+        {
+            ss << hex << ki[i][j];
+            a += ss.str();
+            // cout << "i:" << i << " - j: " << j << " - a: " << a << endl;
+            ss.clear();
+            ss.str("");
+        }
+        key[i] = a;
+    }
+
+    return key;
+}
+
 
 int main()
 {
-   cout << "------------------------------------------------------" << endl;
-   cout << "--                   AES 128 expand                 --" << endl;
-   cout << "--        --------------------------------          --" << endl;
-   cout << "-- 19127392 - 19127525 - 19127625 - 19127631        --" << endl;
-   cout << "------------------------------------------------------" << endl;
+    cout << "------------------------------------------------------" << endl;
+    cout << "--                   AES 128 expand                 --" << endl;
+    cout << "--        --------------------------------          --" << endl;
+    cout << "-- 19127392 - 19127525 - 19127625 - 19127631        --" << endl;
+    cout << "------------------------------------------------------" << endl;
 
-   // input four_word key
-   // cout << "Input four_word key:";
-   // getline(cin, K);
+    // input four_word key
+    // cout << "Input four_word key:";
+    // getline(cin, K);
 
-   string K = "That";
-   unsigned int a = four_bytes_to_int(K);
-   cout << "K: " << K << endl;
-   cout << "4 bytes to int: " << hex << a << endl;
-   cout << "int to 4 bytes: " << int_to_four_bytes(a) << endl;
+    string K = "Thats my Kung Fu";
+    long long *aa = sixteen_bytes_to_four_int(K);
+    //    cout << "K: " << K << endl;
+    //    cout << "16 bytes to 4 ints: " << endl;
+    //    for (int i = 0; i < 4; i++)
+    //        cout << "- int[" << i << "]: " << hex << aa[i] << endl;
 
-   cout << endl;
+    //    string s = four_int_to_sixteen_bytes(aa);
+    //    cout << "4 int to 16 bytes: " << s << endl;
 
-   K = "Thats my Kung Fu";
-   unsigned int *aa = sixteen_bytes_to_four_int(K);
-   cout << "K: " << K << endl;
-   cout << "16 bytes to 4 ints: " << endl;
-   for (int i = 0; i < 4; i++)
-       cout << "- int[" << i << "]: " << hex << aa[i] << endl;
+    string *k = exp(aa);
 
-   string s = four_int_to_sixteen_bytes(aa);
-   cout << "4 int to 16 bytes: " << s << endl;
-
-   unsigned int** k = expand(aa);
-
-   cout << "\nexpand:" << endl;
-   for (int i = 0; i < 11; i++)
-   {
-       cout << dec << "K" << i << ":" << endl;
-       for (int j = 0; j < 4; j++)
-       {
-           cout << "\t- int[" << j << "]: " << hex << k[i][j] << endl;
-       }
-   }
-   return 0;
+    cout << "\nexpand:" << endl;
+    for (int i = 0; i < 11; i++)
+    {
+        // cout << "K" << i << ":" << endl;
+        // for (int j = 0; j < 4; j++)
+        //     cout << "\t- int[" << j << "]: " << hex << k[i][j] << endl;
+        cout << "key [" << i << "]: " << k[i] << endl;
+    }
+    return 0;
 }
